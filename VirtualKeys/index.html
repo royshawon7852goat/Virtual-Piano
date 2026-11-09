@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VirtualKeys • Full 88-Key Piano Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Circular+Std:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="spotify-theme">
+  <!-- AUDIO INITIALIZATION OVERLAY FOR BROWSER AUTOPLAY POLICIES -->
+  <div id="audio-init-overlay" class="audio-init-overlay">
+    <div class="init-card">
+      <div class="init-icon">
+        <svg viewBox="0 0 24 24" width="48" height="48" fill="#1DB954">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+        </svg>
+      </div>
+      <h2>Welcome to VirtualKeys</h2>
+      <p>Full 88-Key Concert Grand Piano Simulator with Polyphonic Web Audio Engine, Spotify Studio Design, and Demo Song Library.</p>
+      <button id="btn-unlock-audio" class="btn-spotify-primary">
+        <span>Enter Studio</span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- 1. LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo" id="brand-home-btn">
+          <div class="brand-icon-wrap">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="#1DB954">
+              <rect x="3" y="4" width="18" height="16" rx="3" fill="#1DB954" opacity="0.2"/>
+              <path d="M4 5h16v14H4z" fill="none" stroke="#1DB954" stroke-width="2"/>
+              <path d="M7 5v8M11 5v8M15 5v8" stroke="#1DB954" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="18" cy="15.5" r="1.5" fill="#1DB954"/>
+            </svg>
+          </div>
+          <span class="brand-name">VirtualKeys</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item active" data-tab="home">
+            <button class="nav-link" id="nav-home">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              </svg>
+              <span>Home</span>
+            </button>
+          </li>
+          <li class="nav-item" data-tab="piano">
+            <button class="nav-link" id="nav-play-piano">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 10.5h-2V5h2v8.5zm4 0h-2V5h2v8.5zM7 5h2v8.5H7V5z"/>
+              </svg>
+              <span>Play Piano (88 Keys)</span>
+            </button>
+          </li>
+          <li class="nav-item" data-tab="demo-songs">
+            <button class="nav-link" id="nav-demo-songs">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/>
+              </svg>
+              <span>Demo Songs</span>
+              <span class="badge green">5</span>
+            </button>
+          </li>
+          <li class="nav-item" data-tab="recordings">
+            <button class="nav-link" id="nav-my-recordings">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="3" fill="#e22134"/>
+              </svg>
+              <span>My Recordings</span>
+              <span class="badge" id="recordings-count-badge">0</span>
+            </button>
+          </li>
+          <li class="nav-item" data-tab="settings">
+            <button class="nav-link" id="nav-settings">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.44.17-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+              </svg>
+              <span>Settings</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- SIDEBAR SPOTIFY LIBRARY (RECENT SONGS & SESSIONS) -->
+      <div class="sidebar-library">
+        <div class="library-header">
+          <div class="library-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H10V8h6v4z"/>
+            </svg>
+            <span>Library</span>
+          </div>
+          <button class="btn-icon-subtle" id="btn-sidebar-upload-midi" title="Load custom MIDI File (.mid)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="library-items" id="sidebar-tracks-list">
+          <!-- Populated dynamically with demo songs and recorded tracks -->
+        </div>
+      </div>
+
+      <!-- SIDEBAR FOOTER GUIDE -->
+      <div class="sidebar-footer">
+        <button class="keyboard-mode-pill" id="btn-toggle-shortcuts-modal">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+          </svg>
+          <span>Keyboard Shortcuts</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 2. MAIN SECTION -->
+    <main class="main-content">
+      <!-- STICKY STUDIO HEADER -->
+      <header class="studio-header">
+        <div class="header-left">
+          <div class="header-nav-arrows">
+            <button class="circle-btn" id="btn-nav-back" title="Back">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+              </svg>
+            </button>
+            <button class="circle-btn" id="btn-nav-forward" title="Forward">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="active-badge-pill">
+            <span class="live-dot"></span>
+            <span id="header-instrument-name">Grand Piano</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Active Octave Window for Computer Keyboard -->
+          <div class="octave-window-tag">
+            <span class="tag-label">Active Keys Octave:</span>
+            <span class="tag-val" id="header-octave-val">C4 – B5</span>
+          </div>
+          <!-- Upload custom MIDI button -->
+          <label class="btn-spotify-secondary file-upload-label" title="Import standard MIDI file (.mid)">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+            </svg>
+            <span>Load MIDI</span>
+            <input type="file" id="input-midi-file" accept=".mid,.midi" style="display: none;">
+          </label>
+          <button class="btn-spotify-pill" id="btn-header-record">
+            <span class="rec-dot"></span>
+            <span id="header-rec-text">Record</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="studio-scrollable">
+        <!-- SPOTIFY WELCOME BANNER (GREEN GRADIENT) -->
+        <section class="welcome-banner">
+          <div class="banner-content">
+            <span class="banner-tag">SPOTIFY-INSPIRED MUSIC STUDIO</span>
+            <h1 class="banner-title">VirtualKeys</h1>
+            <p class="banner-subtitle">Play your music. Create your moment. Experience a genuine full 88-key piano simulator with high-fidelity Web Audio synthesis, MIDI playback, and live visualizer.</p>
+            <div class="banner-actions">
+              <button class="btn-spotify-primary" id="btn-banner-play-piano">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span>Play 88-Key Piano</span>
+              </button>
+              <button class="btn-spotify-secondary" id="btn-banner-demo-list">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+                <span>Demo Songs Library</span>
+              </button>
+            </div>
+          </div>
+          <div class="banner-stats">
+            <div class="stat-box">
+              <span class="stat-number">88</span>
+              <span class="stat-desc">Full Piano Keys (A0 - C8)</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-number">52</span>
+              <span class="stat-desc">White Ivory Keys</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-number">36</span>
+              <span class="stat-desc">Black Ebony Keys</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- INSTRUMENT SELECTOR & STUDIO TOOLS BAR -->
+        <section class="studio-toolbar">
+          <!-- INSTRUMENT SELECTOR -->
+          <div class="toolbar-group">
+            <label class="group-label">Instrument Preset</label>
+            <div class="sound-pills" id="instrument-pills">
+              <button class="pill-btn active" data-sound="grand">
+                <span class="pill-icon">🎹</span>
+                <span>Grand Piano</span>
+              </button>
+              <button class="pill-btn" data-sound="electric">
+                <span class="pill-icon">⚡</span>
+                <span>Electric Piano</span>
+              </button>
+              <button class="pill-btn" data-sound="soft">
+                <span class="pill-icon">☁️</span>
+                <span>Soft Piano</span>
+              </button>
+              <button class="pill-btn" data-sound="synth">
+                <span class="pill-icon">🎛️</span>
+                <span>Synth Piano</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- KEYBOARD OCTAVE WINDOW SELECTOR -->
+          <div class="toolbar-group">
+            <label class="group-label">Keyboard Active Octave</label>
+            <div class="octave-stepper">
+              <button class="btn-octave" id="btn-octave-down" title="Shift Computer Keys Octave Down (Key: Z)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19 13H5v-2h14v2z"/>
+                </svg>
+              </button>
+              <span class="octave-val" id="octave-number">Octave 4</span>
+              <button class="btn-octave" id="btn-octave-up" title="Shift Computer Keys Octave Up (Key: X)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- PIANO ZOOM & VIEW CONTROLS -->
+          <div class="toolbar-group">
+            <label class="group-label">Keyboard View & Zoom</label>
+            <div class="zoom-controls-wrapper">
+              <button class="btn-zoom" id="btn-zoom-out" title="Zoom Out (Narrow Keys)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19 13H5v-2h14v2z"/>
+                </svg>
+              </button>
+              <button class="btn-zoom-pill" id="btn-fit-full-keyboard" title="Fit all 88 keys on screen">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <path d="M4 4h6v2H6v4H4V4zm16 0h-6v2h4v4h2V4zM4 20h6v-2H6v-4H4v6zm16 0h-6v-2h4v-4h2v6z"/>
+                </svg>
+                <span>Fit 88 Keys</span>
+              </button>
+              <button class="btn-zoom" id="btn-zoom-in" title="Zoom In (Wider Keys)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- KEY LABELS TOGGLE -->
+          <div class="toolbar-group">
+            <label class="group-label">Key Labels</label>
+            <div class="toggle-switch-pills">
+              <button class="pill-switch-btn active" data-mode="both">Both</button>
+              <button class="pill-switch-btn" data-mode="keys">Keys</button>
+              <button class="pill-switch-btn" data-mode="notes">Notes</button>
+              <button class="pill-switch-btn" data-mode="off">Off</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SOUND VISUALIZER SECTION -->
+        <section class="visualizer-card">
+          <div class="visualizer-header">
+            <div class="vis-title">
+              <span class="equalizer-icon"><span></span><span></span><span></span></span>
+              <span>Real-Time Web Audio Spectrum Visualizer</span>
+            </div>
+            <div class="vis-tags">
+              <span class="vis-mode-tag">60 FPS • AnalyserNode • 48 kHz</span>
+            </div>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="visualizer-canvas" width="1200" height="96"></canvas>
+          </div>
+        </section>
+
+        <!-- FULL 88-KEY PIANO STAGE -->
+        <section class="piano-stage" id="piano-stage-container">
+          <div class="piano-frame">
+            <!-- PIANO TOP RIM & CONTROLS -->
+            <div class="piano-wood-rim top-rim">
+              <div class="piano-brand-emboss">VIRTUALKEYS • CONCERT GRAND • 88 KEYS (A0 – C8)</div>
+              <div class="piano-scroll-nav">
+                <button class="btn-piano-scroll" id="btn-scroll-piano-left" title="Scroll Left (Bass)">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                  </svg>
+                  <span>Bass (A0)</span>
+                </button>
+                <button class="btn-piano-scroll" id="btn-scroll-piano-middle" title="Center Middle C">
+                  <span>Middle C (C4)</span>
+                </button>
+                <button class="btn-piano-scroll" id="btn-scroll-piano-right" title="Scroll Right (Treble)">
+                  <span>Treble (C8)</span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- PIANO OVERVIEW MINIMAP (Shows all 88 keys with viewport scrubber) -->
+            <div class="piano-overview-minimap" id="piano-overview-strip" title="Click or drag to pan across the 88 keys">
+              <div class="overview-keys-track" id="overview-keys-track">
+                <!-- 52 mini white keys + 36 mini black keys rendered here -->
+              </div>
+              <div class="overview-viewport-handle" id="overview-viewport-handle"></div>
+            </div>
+
+            <!-- SCROLLABLE 88-KEYBOARD WRAPPER -->
+            <div class="piano-scroll-viewport" id="piano-scroll-viewport">
+              <div class="piano-keys-88" id="piano-keyboard-88">
+                <!-- Exactly 88 keys (52 white, 36 black) dynamically created and positioned -->
+              </div>
+            </div>
+
+            <!-- PIANO BOTTOM RIM -->
+            <div class="piano-wood-rim bottom-rim">
+              <div class="bottom-rim-info">
+                <span>💡 Click/touch keys or use your computer keyboard. Hold <strong>Spacebar</strong> for Sustain. Press <strong>Z / X</strong> to shift keyboard octave.</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DEMO SONG LIBRARY SECTION (SPOTIFY INSPIRED) -->
+        <section class="demo-songs-section" id="demo-songs-section">
+          <div class="section-header">
+            <div>
+              <span class="section-tag">SPOTIFY LIBRARY</span>
+              <h2 class="section-title">Demo Song Library</h2>
+              <p class="section-subtitle">Select any classic song to play through the VirtualKeys Web Audio engine with real-time 88-key piano animations.</p>
+            </div>
+            <div class="section-actions">
+              <button class="btn-spotify-secondary" id="btn-demo-filter-all">All Songs</button>
+            </div>
+          </div>
+
+          <!-- DEMO SONG CARDS GRID -->
+          <div class="demo-songs-grid" id="demo-songs-cards-container">
+            <!-- 5 Spotify-inspired demo song cards -->
+          </div>
+
+          <!-- DEMO SONGS TABLE VIEW -->
+          <div class="songs-table-wrapper">
+            <table class="songs-table">
+              <thead>
+                <tr>
+                  <th style="width: 40px;">#</th>
+                  <th>TITLE</th>
+                  <th>COMPOSER</th>
+                  <th>DIFFICULTY</th>
+                  <th>DURATION</th>
+                  <th style="text-align: right; width: 120px;">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="demo-songs-table-body">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- RECORDINGS & SESSIONS SECTION -->
+        <section class="recordings-section" id="recordings-section">
+          <div class="section-header">
+            <div>
+              <span class="section-tag">LOCAL RECORDINGS</span>
+              <h2 class="section-title">My Recorded Sessions</h2>
+              <p class="section-subtitle">Stored safely in your browser's localStorage. Play back, inspect notes, or export to JSON.</p>
+            </div>
+            <div class="section-actions">
+              <button class="btn-spotify-secondary" id="btn-export-all-rec">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                <span>Export JSON</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="recordings-list-container" id="recordings-list-container">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+        <div class="studio-bottom-spacer"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 3. BOTTOM MUSIC PLAYER (SPOTIFY FIXED FOOTER) -->
+  <footer class="spotify-player-bar">
+    <!-- LEFT: NOW PLAYING TRACK / INSTRUMENT -->
+    <div class="player-left">
+      <div class="now-playing-cover">
+        <div class="cover-art" id="player-cover-art">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="#1DB954">
+            <path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-6z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="now-playing-info">
+        <div class="track-title" id="player-track-title">Grand Piano</div>
+        <div class="track-artist" id="player-track-subtitle">VirtualKeys • 88-Key Studio</div>
+      </div>
+      <button class="player-icon-btn btn-like" id="btn-player-favorite" title="Save to Favorites">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- CENTER: PLAYBACK CONTROLS & TIMELINE -->
+    <div class="player-center">
+      <div class="player-controls">
+        <!-- SHUFFLE -->
+        <button class="player-control-btn subtle" id="btn-player-shuffle" title="Shuffle Demo Songs">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+          </svg>
+        </button>
+
+        <!-- PREVIOUS -->
+        <button class="player-control-btn" id="btn-player-prev" title="Previous Song">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </button>
+
+        <!-- RECORD BUTTON -->
+        <button class="player-control-btn rec-btn" id="btn-player-record" title="Record (R)">
+          <span class="rec-inner-circle"></span>
+        </button>
+
+        <!-- MAIN PLAY / PAUSE -->
+        <button class="player-play-btn" id="btn-player-play" title="Play / Pause (P)">
+          <svg id="play-icon" viewBox="0 0 24 24" width="22" height="22" fill="#000000">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          <svg id="pause-icon" viewBox="0 0 24 24" width="22" height="22" fill="#000000" style="display: none;">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+        </button>
+
+        <!-- STOP -->
+        <button class="player-control-btn" id="btn-player-stop" title="Stop Playback">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12"/>
+          </svg>
+        </button>
+
+        <!-- NEXT -->
+        <button class="player-control-btn" id="btn-player-next" title="Next Song">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </button>
+
+        <!-- REPEAT / LOOP -->
+        <button class="player-control-btn subtle" id="btn-player-loop" title="Toggle Loop">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- PROGRESS BAR & TIME COUNTER -->
+      <div class="player-timeline">
+        <span class="time-stamp" id="playback-current-time">0:00</span>
+        <div class="progress-bar-container" id="player-progress-container">
+          <div class="progress-bar-fill" id="player-progress-fill"></div>
+          <div class="progress-scrubber" id="player-progress-scrubber"></div>
+        </div>
+        <span class="time-stamp" id="playback-total-time">0:00</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: SUSTAIN PEDAL, METRONOME, VOLUME -->
+    <div class="player-right">
+      <!-- SUSTAIN PEDAL PILL -->
+      <button class="player-icon-btn sustain-btn" id="btn-player-sustain" title="Sustain Pedal (Spacebar)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M19 13H5v-2h14v2zm-2 4H7v-2h10v2zm4-8H3V7h18v2z"/>
+        </svg>
+        <span class="sustain-label">SUSTAIN</span>
+      </button>
+
+      <!-- METRONOME TOGGLE & BPM -->
+      <button class="player-icon-btn metro-btn" id="btn-player-metro" title="Toggle Metronome (M)">
+        <span class="metronome-tick-dot" id="metronome-beat-dot"></span>
+        <span class="metro-bpm-text" id="player-bpm-text">120</span>
+      </button>
+
+      <!-- VOLUME CONTROLS -->
+      <div class="volume-control-wrapper">
+        <button class="player-icon-btn" id="btn-player-volume-icon" title="Mute / Unmute">
+          <svg id="vol-icon-high" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+          </svg>
+          <svg id="vol-icon-mute" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" style="display: none;">
+            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+          </svg>
+        </button>
+        <div class="vol-slider-bar">
+          <input type="range" id="master-volume-slider" min="0" max="100" value="80" class="spotify-slider" title="Volume Slider">
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 4. KEYBOARD SHORTCUTS MODAL -->
+  <div class="modal-backdrop" id="shortcuts-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="#1DB954">
+            <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+          </svg>
+          <h2>VirtualKeys Keyboard Guide</h2>
+        </div>
+        <button class="modal-close-btn" id="btn-close-shortcuts-modal">&times;</button>
+      </div>
+      <div class="modal-body shortcuts-grid">
+        <div class="shortcut-section">
+          <h4>Computer Keyboard Mapping (Active Octave Window)</h4>
+          <p style="color: #b3b3b3; font-size: 13px; margin-bottom: 12px;">The active octave window maps across two consecutive octaves (e.g. C4 to B5):</p>
+          <div class="sc-row"><span>Lower Octave White Keys (C to B):</span> <code>A, S, D, F, G, H, J</code></div>
+          <div class="sc-row"><span>Lower Octave Black Keys (C# to A#):</span> <code>W, E, T, Y, U</code></div>
+          <div class="sc-row"><span>Upper Octave White Keys (C to B):</span> <code>K, L, ;, ', Z, X, C</code></div>
+          <div class="sc-row"><span>Upper Octave Black Keys (C# to A#):</span> <code>O, P, ], 8, 9</code></div>
+        </div>
+        <div class="shortcut-section">
+          <h4>Studio Controls</h4>
+          <div class="sc-row"><span>Sustain Pedal:</span> <code>Spacebar</code> (Hold or Toggle)</div>
+          <div class="sc-row"><span>Shift Octave Window Down / Up:</span> <code>Z</code> / <code>X</code></div>
+          <div class="sc-row"><span>Start / Stop Recording:</span> <code>R</code></div>
+          <div class="sc-row"><span>Play / Pause Song Playback:</span> <code>P</code></div>
+          <div class="sc-row"><span>Metronome Toggle:</span> <code>M</code></div>
+          <div class="sc-row"><span>Fit 88 Keys on Screen:</span> <code>F</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SETTINGS MODAL -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="#1DB954">
+            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.44.17-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+          </svg>
+          <h2>VirtualKeys Settings</h2>
+        </div>
+        <button class="modal-close-btn" id="btn-close-settings-modal">&times;</button>
+      </div>
+      <div class="modal-body settings-list">
+        <div class="setting-item">
+          <div class="setting-text">
+            <h4>Acoustic Room Reverb</h4>
+            <p>Simulate realistic concert hall acoustic resonance with stereo impulse convolution.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-reverb" checked>
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-text">
+            <h4>Auto-Scroll to Playing Notes</h4>
+            <p>Automatically pan the 88-key piano keyboard to follow active notes during song playback.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-autoscroll" checked>
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-text">
+            <h4>Sustain Pedal Latch Mode</h4>
+            <p>Toggle sustain state on key tap instead of requiring holding down Spacebar.</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-sustain-latch" checked>
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
